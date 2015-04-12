@@ -25,6 +25,7 @@
 (sn/reload-non-sentence-regex)
 
 (setq sn/maybe-sentence-regex "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
+(setq sn/maybe-sentence-end-regex "\\.[\"”`]?")
 
 (defun sn/forward-sentence (&optional arg)
   (interactive)
@@ -35,6 +36,9 @@
       (right-char))
     (while (progn
              (let ((case-fold-search nil))
+               ;; move back so that don't skip next sentence if right before it
+               (while (looking-back sn/maybe-sentence-end-regex)
+                 (left-char))
                (re-search-forward sn/maybe-sentence-regex)
                (while (not (and (looking-at "[[:upper:]\"“`]")
                                 (looking-back "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)")))
