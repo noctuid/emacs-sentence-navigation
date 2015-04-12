@@ -1,0 +1,27 @@
+* About
+=sentence-navigation.el= is inspired by [[https://github.com/reedes/vim-textobj-sentence][vim-textobj-sentence]] and uses a mostly the same default abbreviation list. It provides alternatives to ~forward-sentence~, ~backward-sentence~, and sentence text objects that work with sentences separated by one (or two) space(s) and is aware of abbreviations. The abbreviation list can be customized.
+
+* Example Configuration
+There are no default key bindings. Unlike with the normal forward and backward sentence commands, these commands will move to the beginning or end of the sentence, not to the space in between.
+** Evil
+#+begin_src emacs-lisp
+(define-key evil-normal-state-map ")" 'sn/evil-forward-sentence)
+(define-key evil-normal-state-map "(" 'sn/evil-backward-sentence)
+(define-key evil-normal-state-map "g)" 'sn/evil-forward-sentence-end)
+(define-key evil-normal-state-map "g(" 'sn/evil-backward-sentence-end)
+(define-key evil-outer-text-objects-map "s" 'sn/evil-outer-sentence)
+(define-key evil-inner-text-objects-map "s" 'sn/evil-inner-sentence)
+#+end_src
+** No Evil
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-e") 'sn/forward-sentence')
+(global-set-key (kbd "M-a") 'sn/backward-sentence')
+#+end_src
+
+* Definition of a Sentence and Impossible Cases
+Sentences start with a capital letter (or some type of a quotation mark) and end with a period followed by one or two spaces. Sentences cannot end in abbreviations, which means that if a sentence actually does end in a abbreviation, that case won't work. This doesn't happen very often though. I did, however, remove the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
+
+Also if hard line wrapping (yuck) is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line.
+
+* Other Notes
+Emacs doesn't have support for negative look behind, so this uses ~looking-back~. Emacs says this should be avoided because it is slow, but it works fine for this.
