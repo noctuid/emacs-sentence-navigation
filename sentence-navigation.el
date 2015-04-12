@@ -20,7 +20,7 @@
         (concat
          " [\(\"'`“]?\\("
          (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/non-sentence-list)
-         "\\)\\.  ?")))
+         "\\)\\. ")))
 
 (sn/reload-non-sentence-regex)
 
