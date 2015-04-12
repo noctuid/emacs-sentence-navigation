@@ -104,7 +104,9 @@
   (put 'sn/evil-a-sentence 'forward-op   'sn/evil-forward-sentence)
 
   (put 'sn/evil-inner-sentence 'beginning-op 'sn/evil-backward-sentence)
-  (put 'sn/evil-inner-sentence 'forward-op 'sn/evil-forward-sentence-end)
+  (put 'sn/evil-inner-sentence 'forward-op (lambda (count)
+                                             (sn/evil-forward-sentence-end count)
+                                             (right-char)))
 
   (evil-define-text-object sn/evil-outer-sentence (count &optional beg end type)
     (evil-select-inner-object 'sn/evil-a-sentence beg end type count))
