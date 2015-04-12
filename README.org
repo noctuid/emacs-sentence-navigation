@@ -19,7 +19,7 @@ There are no default key bindings. Unlike with the normal forward and backward s
 #+end_src
 
 * Definition of a Sentence and Impossible Cases
-Sentences start with a capital letter (or some type of a quotation mark) and end with a period followed by one or two spaces. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them. One-spaced sentences cannot end in abbreviations, which means that if a sentence actually does end in a abbreviation, that case won't work. This doesn't happen very often though. I did, however, remove the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
+Sentences start with a capital letter (or some type of a left quotation mark) and end with a period followed possibly by some right quotation mark and then one or two spaces. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them. One-spaced sentences that aren't in quotes cannot end in abbreviations, which means that if a sentence actually does end in a abbreviation, that case won't work. This doesn't happen very often though. I did, however, remove the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
 
 Also if hard line wrapping (yuck) is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line.
 

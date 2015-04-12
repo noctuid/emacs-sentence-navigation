@@ -24,7 +24,7 @@
 
 (sn/reload-non-sentence-regex)
 
-(setq sn/maybe-sentence-regex "\\(\\.  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
+(setq sn/maybe-sentence-regex "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
 
 (defun sn/forward-sentence (&optional arg)
   (interactive)
@@ -37,7 +37,7 @@
              (let ((case-fold-search nil))
                (re-search-forward sn/maybe-sentence-regex)
                (while (not (and (looking-at "[[:upper:]\"“`]")
-                                (looking-back "\\(\\.  ?\\|^[[:space:]]*\\)")))
+                                (looking-back "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)")))
                  (left-char)))
              (looking-back not-a-sentence)))))
 
@@ -54,7 +54,7 @@
     (while (progn
              (let ((case-fold-search nil))
                (re-search-backward sn/maybe-sentence-regex)
-               (while (looking-at "[\\. ]")
+               (while (looking-at "[\\.\"”` ]")
                  (right-char)))
              (looking-back not-a-sentence)))))
 
