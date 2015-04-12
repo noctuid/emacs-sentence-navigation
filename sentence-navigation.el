@@ -16,7 +16,7 @@
         "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
 
 (defun sn/reload-non-sentence-regex ()
-  (setq not-a-sentence
+  (setq sn/not-a-sentence
         (concat
          " [\(\"'`“]?\\("
          (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/non-sentence-list)
@@ -26,6 +26,7 @@
 
 (setq sn/maybe-sentence-regex "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
 (setq sn/maybe-sentence-end-regex "\\.[\"”`]?")
+(setq sn/maybe-after-sentence-end-regex "\\.[\"”`]?\\( \\|$\\)")
 
 (defun sn/forward-sentence (&optional arg)
   (interactive)
@@ -43,14 +44,22 @@
                (while (not (and (looking-at "[[:upper:]\"“`]")
                                 (looking-back "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)")))
                  (left-char)))
-             (looking-back not-a-sentence)))))
+             (looking-back sn/not-a-sentence)))))
 
 (defun sn/forward-sentence-end (&optional arg)
   (interactive)
-  ;; wtf elisp, no default args
-  (sn/forward-sentence (or (when arg (+ 1 arg)) 2))
-  (while (not (looking-at "[\\.\"”`]"))
-    (left-char)))
+  (dotimes (_ (or arg 1))
+    ;; move to start of next sentence if already at end of current
+    (when (and (looking-at "[\\.”\"`]")
+               ;; " is ambigious for sentence start or end
+               (not (looking-at "[\"`][[:upper:]]")))
+      (sn/forward-sentence))
+    (while (progn
+             (re-search-forward sn/maybe-after-sentence-end-regex)
+             ;; won't be a space if at eol
+             (looking-back (concat sn/not-a-sentence "?"))))
+    (while (not (looking-at "[\\.\"”`]"))
+      (left-char))))
 
 (defun sn/backward-sentence (&optional arg)
   (interactive)
@@ -62,13 +71,19 @@
                        (looking-at "[\\.\"”` ]")
                        (not (looking-at "[\"“`][[:upper:]]")))
                  (right-char)))
-             (looking-back not-a-sentence)))))
+             (looking-back sn/not-a-sentence)))))
 
 (defun sn/backward-sentence-end (&optional arg)
   (interactive)
-  (sn/backward-sentence (or arg 1))
-  (while (not (looking-at "[\\.\"”`]"))
-    (left-char)))
+  (dotimes (_ (or arg 1))
+    ;; move forward so don't skip prevous sentence if right in front of it
+    (while (looking-at "[[:upper:]\"“`]")
+      (right-char))
+    (while (progn
+             (re-search-backward sn/maybe-after-sentence-end-regex)
+             (when (looking-at "\\.[\"”`]")
+               (right-char))
+             (looking-back (cl-subseq sn/not-a-sentence 0 -3))))))
 
 ;; add evil motions and text-objects if evil exists
 (when (require 'evil nil :noerror)
@@ -100,7 +115,7 @@
 ;; (defun sn/start-of-sentence-p ()
 ;;   (and (looking-back "\\(\\.  ?\\|^[[:space:]]*\\)")
 ;;        (looking-at "[[:upper:]\"“`]")
-;;        (not (looking-back not-a-sentence))))
+;;        (not (looking-back sn/not-a-sentence))))
 
 ;; (defun sn/sentence-begin ()
 ;;   (interactive)
