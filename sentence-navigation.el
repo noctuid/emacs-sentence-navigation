@@ -45,7 +45,7 @@
   (interactive)
   ;; wtf elisp, no default args
   (sn/forward-sentence (or (when arg (+ 1 arg)) 2))
-  (while (not (looking-at "\\."))
+  (while (not (looking-at "[\\.\"”`]"))
     (left-char)))
 
 (defun sn/backward-sentence (&optional arg)
@@ -54,14 +54,16 @@
     (while (progn
              (let ((case-fold-search nil))
                (re-search-backward sn/maybe-sentence-regex)
-               (while (looking-at "[\\.\"”` ]")
+               (while (and
+                       (looking-at "[\\.\"”` ]")
+                       (not (looking-at "[\"“`][[:upper:]]")))
                  (right-char)))
              (looking-back not-a-sentence)))))
 
 (defun sn/backward-sentence-end (&optional arg)
   (interactive)
   (sn/backward-sentence (or arg 1))
-  (while (not (looking-at "\\."))
+  (while (not (looking-at "[\\.\"”`]"))
     (left-char)))
 
 ;; add evil motions and text-objects if evil exists
