@@ -23,8 +23,9 @@
   :group 'sentence-navigation
   :type 'list)
 
+(defvar sn--not-a-sentence nil)
 (defun sn/reload-non-sentence-regex ()
-  (setq sn/not-a-sentence
+  (setq sn--not-a-sentence
         (concat
          " [\(\"'`“]?\\("
          (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/abbreviation-list)
@@ -32,9 +33,10 @@
 
 (sn/reload-non-sentence-regex)
 
-(setq sn/maybe-sentence-regex "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
-(setq sn/maybe-sentence-end-regex "\\.[\"”`]?")
-(setq sn/maybe-after-sentence-end-regex "\\.[\"”`]?\\( \\|$\\)")
+(defvar sn--maybe-sentence-regex
+  "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)[[:upper:]\"“`]")
+(defvar sn--maybe-sentence-end "\\.[\"”`]?")
+(defvar sn--maybe-after-sentence-end-regex "\\.[\"”`]?\\( \\|$\\)")
 
 (defun sn/forward-sentence (&optional arg)
   (interactive)
@@ -46,13 +48,13 @@
     (while (progn
              (let ((case-fold-search nil))
                ;; move back so that don't skip next sentence if right before it
-               (while (looking-back sn/maybe-sentence-end-regex)
+               (while (looking-back sn--maybe-sentence-end)
                  (left-char))
-               (re-search-forward sn/maybe-sentence-regex)
+               (re-search-forward sn--maybe-sentence-regex)
                (while (not (and (looking-at "[[:upper:]\"“`]")
                                 (looking-back "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)")))
                  (left-char)))
-             (looking-back sn/not-a-sentence)))))
+             (looking-back sn--not-a-sentence)))))
 
 (defun sn/forward-sentence-end (&optional arg)
   (interactive)
@@ -63,9 +65,9 @@
                (not (looking-at "[\"`][[:upper:]]")))
       (sn/forward-sentence))
     (while (progn
-             (re-search-forward sn/maybe-after-sentence-end-regex)
+             (re-search-forward sn--maybe-after-sentence-end-regex)
              ;; won't be a space if at eol
-             (looking-back (concat sn/not-a-sentence "?"))))
+             (looking-back (concat sn--not-a-sentence "?"))))
     (while (not (looking-at "[\\.\"”`]"))
       (left-char))))
 
@@ -74,12 +76,12 @@
   (dotimes (_ (or arg 1))
     (while (progn
              (let ((case-fold-search nil))
-               (re-search-backward sn/maybe-sentence-regex)
+               (re-search-backward sn--maybe-sentence-regex)
                (while (and
                        (looking-at "[\\.\"”` ]")
                        (not (looking-at "[\"“`][[:upper:]]")))
                  (right-char)))
-             (looking-back sn/not-a-sentence)))))
+             (looking-back sn--not-a-sentence)))))
 
 (defun sn/backward-sentence-end (&optional arg)
   (interactive)
@@ -88,10 +90,10 @@
     (while (looking-at "[[:upper:]\"“`]")
       (right-char))
     (while (progn
-             (re-search-backward sn/maybe-after-sentence-end-regex)
+             (re-search-backward sn--maybe-after-sentence-end-regex)
              (when (looking-at "\\.[\"”`]")
                (right-char))
-             (looking-back (cl-subseq sn/not-a-sentence 0 -3))))))
+             (looking-back (cl-subseq sn--not-a-sentence 0 -3))))))
 
 ;; add evil motions and text-objects if evil exists
 (when (require 'evil nil :noerror)
