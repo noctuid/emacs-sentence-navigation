@@ -1,8 +1,19 @@
 * About
-=sentence-navigation.el= is inspired by [[https://github.com/reedes/vim-textobj-sentence][vim-textobj-sentence]] and uses a mostly the same default abbreviation list. It provides alternatives to ~forward-sentence~, ~backward-sentence~, and sentence text objects that work with sentences separated by one (or two) space(s) and is aware of abbreviations. The abbreviation list can be customized.
+=sentence-navigation.el= is inspired by [[https://github.com/reedes/vim-textobj-sentence][vim-textobj-sentence]] and uses a mostly the same default abbreviation list. It provides alternatives to ~forward-sentence~, ~backward-sentence~, and sentence text objects that work with sentences separated by one (or two) space(s) and is aware of abbreviations.
 
 * Example Configuration
 There are no default key bindings. Unlike with the normal forward and backward sentence commands, these commands will move to the beginning or end of the sentence, not to the space in between.
+** Abbreviations
+The list of abbreviations to ignore can be customized. The defaults are mostly the same as vim-textobj-sentence's.
+#+begin_src emacs-lisp
+(setq sn/abbreviation-list
+      '("[ABCDIMPSUabcdegimpsv]"
+        "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
+        "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
+        "alt" "[Ee]tc" "div" "es[pt]" "[Ll]td" "min"
+        "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
+        "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
+#+end_src
 ** Evil
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map ")" 'sn/evil-forward-sentence)

@@ -7,19 +7,21 @@
 ;;; Code:
 (require 'cl-lib)
 
-(setq sn/non-sentence-list
-      '("[ABCDIMPSUabcdegimpsv]"
-        "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
-        "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
-        "alt" "[Ee]tc" "div" "es[pt]" "[Ll]td" "min"
-        "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
-        "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
+(defcustom sn/abbreviation-list
+  '("[ABCDIMPSUabcdegimpsv]"
+    "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
+    "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
+    "alt" "[Ee]tc" "div" "es[pt]" "[Ll]td" "min"
+    "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
+    "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ")
+  "List containing abbreviations that should be ignored."
+  :type 'list)
 
 (defun sn/reload-non-sentence-regex ()
   (setq sn/not-a-sentence
         (concat
          " [\(\"'`“]?\\("
-         (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/non-sentence-list)
+         (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/abbreviation-list)
          "\\)\\. ")))
 
 (sn/reload-non-sentence-regex)
