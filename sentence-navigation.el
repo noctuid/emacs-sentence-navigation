@@ -7,6 +7,11 @@
 ;;; Code:
 (require 'cl-lib)
 
+(defgroup sentence-navigation nil
+  "Gives commands for navigating sentences and evil text objects for manipulating them."
+  :group 'editing
+  :prefix 'sn/)
+
 (defcustom sn/abbreviation-list
   '("[ABCDIMPSUabcdegimpsv]"
     "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
@@ -15,6 +20,7 @@
     "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
     "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ")
   "List containing abbreviations that should be ignored."
+  :group 'sentence-navigation
   :type 'list)
 
 (defun sn/reload-non-sentence-regex ()
