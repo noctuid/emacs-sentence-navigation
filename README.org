@@ -14,6 +14,10 @@ The list of abbreviations to ignore can be customized. The defaults are mostly t
         "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
         "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
 #+end_src
+If you change the abbreviation list after loading the package, you will need to run the following as well:
+#+begin_src emacs-lisp
+(sn/reload-non-sentence-regex)
+#+end_src
 ** Evil
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map ")" 'sn/evil-forward-sentence)
