@@ -41,6 +41,8 @@
 (defun sn/forward-sentence (&optional arg)
   (interactive)
   (dotimes (_ (or arg 1))
+    ;; save point in case there is no match
+    (point-to-register 'sn-saved-point)
     ;; so won't stay on current sentence if at beginning of line
     (when (and (looking-at "^[[:space:]]*[[:upper:]\"“`]")
                (looking-at "[[:upper:]\"“`]"))
@@ -50,7 +52,10 @@
                ;; move back so that don't skip next sentence if right before it
                (while (looking-back sn--maybe-sentence-end)
                  (left-char))
-               (re-search-forward sn--maybe-sentence-regex nil t)
+               ;; don't move at all if search fails
+               (unless (re-search-forward sn--maybe-sentence-regex nil t)
+                 (jump-to-register 'sn-saved-point)
+                 (return nil))
                (while (not (and (looking-at "[[:upper:]\"“`]")
                                 (looking-back "\\(\\.[\"”`]?  ?\\|^[[:space:]]*\\)")))
                  (left-char)))
@@ -59,13 +64,16 @@
 (defun sn/forward-sentence-end (&optional arg)
   (interactive)
   (dotimes (_ (or arg 1))
+    (point-to-register 'sn-saved-point)
     ;; move to start of next sentence if already at end of current
     (when (and (looking-at "[\\.”\"`]")
                ;; " is ambigious for sentence start or end
                (not (looking-at "[\"`][[:upper:]]")))
       (sn/forward-sentence))
     (while (progn
-             (re-search-forward sn--maybe-after-sentence-end-regex nil t)
+             (unless (re-search-forward sn--maybe-after-sentence-end-regex nil t)
+               (jump-to-register 'sn-saved-point)
+               (return nil))
              ;; won't be a space if at eol
              (looking-back (concat sn--not-a-sentence "?"))))
     (while (not (looking-at "[\\.\"”`]"))
@@ -76,7 +84,8 @@
   (dotimes (_ (or arg 1))
     (while (progn
              (let ((case-fold-search nil))
-               (re-search-backward sn--maybe-sentence-regex nil t)
+               (unless (re-search-backward sn--maybe-sentence-regex nil t)
+                 (return nil))
                (while (and
                        (looking-at "[\\.\"”` ]")
                        (not (looking-at "[\"“`][[:upper:]]")))
@@ -86,11 +95,14 @@
 (defun sn/backward-sentence-end (&optional arg)
   (interactive)
   (dotimes (_ (or arg 1))
+    (point-to-register 'sn-saved-point)
     ;; move forward so don't skip prevous sentence if right in front of it
     (while (looking-at "[[:upper:]\"“`]")
       (right-char))
     (while (progn
-             (re-search-backward sn--maybe-after-sentence-end-regex nil t)
+             (unless (re-search-backward sn--maybe-after-sentence-end-regex nil t)
+               (jump-to-register 'sn-saved-point)
+               (return nil))
              (when (looking-at "\\.[\"”`]")
                (right-char))
              (looking-back (cl-subseq sn--not-a-sentence 0 -3))))))
