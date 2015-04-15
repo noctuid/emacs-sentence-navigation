@@ -87,7 +87,7 @@
                (unless (re-search-backward sn--maybe-sentence-regex nil t)
                  (return nil))
                (while (and
-                       (looking-at "[\\.\"”` ]")
+                       (looking-at "[\\.\"”`[:space:]]")
                        (not (looking-at "[\"“`][[:upper:]]")))
                  (right-char)))
              (looking-back sn--not-a-sentence)))))
