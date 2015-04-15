@@ -97,7 +97,8 @@
   (dotimes (_ (or arg 1))
     (point-to-register 'sn-saved-point)
     ;; move forward so don't skip prevous sentence if right in front of it
-    (while (looking-at "[[:upper:]\"“`]")
+    (while (and (looking-at "[[:upper:]\"“`]")
+                (not (looking-at "[\"`]$")))
       (right-char))
     (while (progn
              (unless (re-search-backward sn--maybe-after-sentence-end-regex nil t)
