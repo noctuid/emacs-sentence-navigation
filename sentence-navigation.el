@@ -65,19 +65,19 @@
   (interactive)
   (dotimes (_ (or arg 1))
     (point-to-register 'sn-saved-point)
-    ;; move to start of next sentence if already at end of current
-    (when (and (looking-at "[\\.”\"`]")
-               ;; " is ambigious for sentence start or end
-               (not (looking-at "[\"`][[:upper:]]")))
-      (sn/forward-sentence))
     (while (progn
+             ;; move to start of next possible sentence
+             ;; if already at end of current or after an abbrev
+             (when (and (looking-at "[\\.”\"`]")
+                        ;; " is ambigious for sentence start or end
+                        (not (looking-at "[\"`][[:upper:]]")))
+               (re-search-forward sn--maybe-sentence-regex nil t))
              (unless (re-search-forward sn--maybe-after-sentence-end-regex nil t)
                (jump-to-register 'sn-saved-point)
                (return nil))
-             ;; won't be a space if at eol
-             (looking-back (concat sn--not-a-sentence "?"))))
-    (while (not (looking-at "[\\.\"”`]"))
-      (left-char))))
+             (while (not (looking-at "[\\.\"”`]"))
+               (left-char))
+             (looking-back (concat (cl-subseq sn--not-a-sentence 0 -1) "?"))))))
 
 (defun sn/backward-sentence (&optional arg)
   (interactive)
