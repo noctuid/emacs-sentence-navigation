@@ -33,10 +33,11 @@ If you change the abbreviation list after loading the package, you will need to 
 (global-set-key (kbd "M-a") 'sn/backward-sentence')
 #+end_src
 
-* Definition of a Sentence and Impossible Cases
-Sentences start with a capital letter (or some type of a left quotation mark) and end with a period followed possibly by some right quotation mark(s) and then one or two spaces. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
+* Definition of a Sentence
+Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
 
-One-spaced sentences that aren't in quotes and end in an abbreviation will not be considered sentences. This doesn't happen very often though. I have, however, removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
+* Impossible Cases
+For the most part, this plugin can distinguish accurately between one-spaced sentences and abbreviations. In the rare case that a sentence actually does end in an abbreviation (not followed by "?", "!", etc.), this plugin will skip over that sentence. Because of this, I have removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
 
 Also if hard line wrapping is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line. It is possible to fix this for single-spaced hard-wrapped sentences by checking if the previous line ends in a period and not an abbreviation, but I haven't bothered implementing this extra check for now at least.
 

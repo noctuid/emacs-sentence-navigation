@@ -41,12 +41,12 @@
   (let ((add-ins (list
                   ;; wish could use previous ones..
                   `(left-quotes . ,(rx (in "\"“`'")))
-                  `(sentence-end-char . ,(rx (in ".\"”`'")))
+                  `(sentence-end-char . ,(rx (in ".\"”`'!?…。？")))
                   `(0+-left-quotes . ,(rx (0+ (in "\"“`'"))))
                   `(0+-right-quotes . ,(rx (0+ (in "\"”`'"))))
                   `(maybe-sentence-start . ,(rx (0+ (in "\"“`'"))
                                                 upper))
-                  `(maybe-sentence-end . ,(rx "." (0+ (in "\"”`'"))))
+                  `(maybe-sentence-end . ,(rx (in ".!?…。？") (0+ (in "\"”`'"))))
                   `(bol-ignoring-ws . ,(rx bol (0+ space))))))
     `(let ((rx-constituents (append ',add-ins rx-constituents nil)))
        ,@body-forms)))
