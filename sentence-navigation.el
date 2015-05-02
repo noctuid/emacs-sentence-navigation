@@ -1,8 +1,23 @@
+;;; sentence-navigation.el --- Commands to navigate one-spaced sentences.
+
+;; Author: Lit Wakefield <nocturnal.artifice@gmail.com>
+;; URL: https://github.com/angelic-sedition/emacs-sentence-navigation
+;; Keywords: sentence evil
+;; Package-Requires: ((cl-lib "0.5"))
+;; Version: 0.1
+
 ;;; Commentary:
-;;
-;; Gives commands for sentence navigation ignoring abbreviations and such.
-;;
-;; The regex is modified from vim-textobj-sentence's regex.
+;; This package gives commands for sentence navigation and manipulation
+;; that ignore abbreviations. For example, in a sentence that contains
+;; "Mr. MacGyver", "MacGyver" will not be considered to be the start of
+;; a sentence. One-spaced sentences are the target of this plugin, but
+;; it will also work properly with two-spaced sentences.
+
+;; This package is inspired by vim-textobj-sentence and uses a modified
+;; version of its default regex list. Evil is an optional dependency
+;; that is used for the text objects this package provides.
+
+;; For more information see the README in the github repo.
 
 ;;; Code:
 (require 'cl-lib)
@@ -189,3 +204,4 @@
     (evil-select-inner-object 'sn/evil-inner-sentence beg end type count)))
 
 (provide 'sentence-navigation)
+;;; sentence-navigation.el ends here
