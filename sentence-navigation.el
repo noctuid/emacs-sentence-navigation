@@ -55,7 +55,8 @@
 (defvar sn--maybe-sentence-search
       (sn--rx-extra (rx (or
                          (and maybe-sentence-end " " (optional " "))
-                         (and bol (0+ space)))
+                         ;; non-precise but hopefully comprehensive way to deal with comments
+                         (and bol (0+ space) (0+ (not letter)) (0+ space)))
                         maybe-sentence-start)))
 
 (defvar sn--maybe-sentence-end-search
