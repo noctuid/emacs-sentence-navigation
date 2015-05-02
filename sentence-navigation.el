@@ -86,6 +86,7 @@
 
 ;; actual commands
 (defun sn/forward-sentence (&optional arg)
+  "Move to the start of the next sentence ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     ;; save point in case there is no match
@@ -106,6 +107,7 @@
              (looking-back sn--not-a-sentence)))))
 
 (defun sn/forward-sentence-end (&optional arg)
+  "Move to the start of the next sentence end ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     (point-to-register 'sn-saved-point)
@@ -124,6 +126,7 @@
              (looking-back sn--not-a-sentence)))))
 
 (defun sn/backward-sentence (&optional arg)
+  "Move to the start of the previous sentence ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     (while (let ((case-fold-search nil))
@@ -134,6 +137,7 @@
              (looking-back sn--not-a-sentence)))))
 
 (defun sn/backward-sentence-end (&optional arg)
+  "Move to the start of the previous sentence end ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     (point-to-register 'sn-saved-point)
@@ -153,15 +157,19 @@
 (when (require 'evil nil :noerror)
 
   (evil-define-motion sn/evil-forward-sentence (count)
+    "Move to the start of the COUNT-th next sentence."
     (sn/forward-sentence (or count 1)))
 
   (evil-define-motion sn/evil-forward-sentence-end (count)
+    "Move to the end of the COUNT-th next sentence."
     (sn/forward-sentence-end (or count 1)))
 
   (evil-define-motion sn/evil-backward-sentence (count)
+    "Move to the start of the COUNT-th previous sentence."
     (sn/backward-sentence (or count 1)))
 
   (evil-define-motion sn/evil-backward-sentence-end (count)
+    "Move to the end of the COUNT-th privous sentence."
     (sn/backward-sentence-end (or count 1)))
 
   (put 'sn/evil-a-sentence 'beginning-op 'sn/evil-backward-sentence)
@@ -173,9 +181,11 @@
                                              (right-char)))
 
   (evil-define-text-object sn/evil-outer-sentence (count &optional beg end type)
+    "Select a sentence including spaces after it."
     (evil-select-inner-object 'sn/evil-a-sentence beg end type count))
 
   (evil-define-text-object sn/evil-inner-sentence (count &optional beg end type)
+    "Select a sentence excluding spaces after it."
     (evil-select-inner-object 'sn/evil-inner-sentence beg end type count)))
 
 (provide 'sentence-navigation)
