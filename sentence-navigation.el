@@ -38,33 +38,33 @@
 
 ;; as suggested by emacs wiki
 (defmacro sn--rx-extra (&rest body-forms)
-   (let ((add-ins (list
-                   ;; wish could use previous ones..
-                   `(left-quotes . ,(rx (in "\"“`'")))
-                   `(sentence-end-char . ,(rx (in ".\"”`'")))
-                   `(0+-left-quotes . ,(rx (0+ (in "\"“`'"))))
-                   `(0+-right-quotes . ,(rx (0+ (in "\"”`'"))))
-                   `(maybe-sentence-start . ,(rx (0+ (in "\"“`'"))
-                                                 upper))
-                   `(maybe-sentence-end . ,(rx "." (0+ (in "\"”`'"))))
-                   `(bol-ignoring-ws . ,(rx bol (0+ space))))))
-     `(let ((rx-constituents (append ',add-ins rx-constituents nil)))
-        ,@body-forms)))
+  (let ((add-ins (list
+                  ;; wish could use previous ones..
+                  `(left-quotes . ,(rx (in "\"“`'")))
+                  `(sentence-end-char . ,(rx (in ".\"”`'")))
+                  `(0+-left-quotes . ,(rx (0+ (in "\"“`'"))))
+                  `(0+-right-quotes . ,(rx (0+ (in "\"”`'"))))
+                  `(maybe-sentence-start . ,(rx (0+ (in "\"“`'"))
+                                                upper))
+                  `(maybe-sentence-end . ,(rx "." (0+ (in "\"”`'"))))
+                  `(bol-ignoring-ws . ,(rx bol (0+ space))))))
+    `(let ((rx-constituents (append ',add-ins rx-constituents nil)))
+       ,@body-forms)))
 
 ;; regex for searching forward/backward
 (defvar sn--maybe-sentence-search
-      (sn--rx-extra (rx (or
-                         (and maybe-sentence-end " " (optional " "))
-                         ;; non-precise but hopefully comprehensive way to deal with comments
-                         (and bol (0+ space) (0+ (not letter)) (0+ space)))
-                        maybe-sentence-start)))
+  (sn--rx-extra (rx (or
+                     (and maybe-sentence-end " " (optional " "))
+                     ;; non-precise but hopefully comprehensive way to deal with comments
+                     (and bol (0+ space) (0+ (not letter)) (0+ space)))
+                    maybe-sentence-start)))
 
 (defvar sn--maybe-sentence-end-search
-      (sn--rx-extra (rx maybe-sentence-end
-                        (or
-                         (and " " (optional " ")
-                              maybe-sentence-start)
-                         (and (0+ space) eol)))))
+  (sn--rx-extra (rx maybe-sentence-end
+                    (or
+                     (and " " (optional " ")
+                          maybe-sentence-start)
+                     (and (0+ space) eol)))))
 
 ;; helpers for correcting positioning
 (defvar sn--maybe-sentence-start (sn--rx-extra (rx maybe-sentence-start)))
