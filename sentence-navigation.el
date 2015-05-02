@@ -83,11 +83,6 @@
 (defun sn--maybe-at-sentence-end-p ()
   (looking-at (sn--rx-extra (rx sentence-end-char (or " " eol)))))
 
-(defun sn--at-sentence-end-p ()
-  (let ((case-fold-search nil))
-    (and (sn--maybe-at-sentence-end-p)
-         (not (looking-back sn--not-a-sentence)))))
-
 ;; actual commands
 (defun sn/forward-sentence (&optional arg)
   (interactive)
@@ -116,8 +111,10 @@
     (while (let ((case-fold-search nil))
              ;; move to start of next possible sentence
              ;; if already at end of current or after an abbrev
-             (when (sn--at-sentence-end-p)
-               (re-search-forward sn--maybe-sentence-start nil t))
+             (when (sn--maybe-at-sentence-end-p)
+               (unless (re-search-forward sn--maybe-sentence-start nil t)
+                 ;; prevents infinite loop at end of file after abbrev
+                 (return nil)))
              (unless (re-search-forward sn--maybe-sentence-end-search nil t)
                (jump-to-register 'sn-saved-point)
                (return nil))
