@@ -21,7 +21,7 @@
 
 ;;; Code:
 (require 'cl-lib)
-(require 'ample-regexps)
+(eval-and-compile (require 'ample-regexps))
 
 (defgroup sentence-navigation nil
   "Gives commands for navigating sentences and evil text objects for manipulating them."
