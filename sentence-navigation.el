@@ -3,7 +3,7 @@
 ;; Author: Lit Wakefield <nocturnal.artifice@gmail.com>
 ;; URL: https://github.com/angelic-sedition/emacs-sentence-navigation
 ;; Keywords: sentence evil
-;; Package-Requires: ((cl-lib "0.5"))
+;; Package-Requires: ((cl-lib "0.5") (ample-regexps "0.1"))
 ;; Version: 0.1
 
 ;;; Commentary:
@@ -21,6 +21,7 @@
 
 ;;; Code:
 (require 'cl-lib)
+(require 'ample-regexps)
 
 (defgroup sentence-navigation nil
   "Gives commands for navigating sentences and evil text objects for manipulating them."
@@ -38,66 +39,62 @@
   :group 'sentence-navigation
   :type 'list)
 
+(define-arx sn--rx
+  '((left-quotes (in "\"“`'"))
+    (right-quotes (in "\"”`'"))
+    (0+-left-quotes (0+ left-quotes))
+    (0+-right-quotes (0+ right-quotes))
+    (sentence-ending-char (in ".!?…。？"))
+    (sentence-final-char (or sentence-ending-char right-quotes))
+    (maybe-sentence-start (seq 0+-left-quotes upper))
+    (maybe-sentence-end (seq sentence-ending-char 0+-right-quotes))
+    (bol-ignoring-ws (seq bol (0+ space)))))
+
 (defvar sn--not-a-sentence nil)
 (defun sn/reload-non-sentence-regex ()
   (setq sn--not-a-sentence
         (concat
-         (rx (or bol " ") (0+ (in "\(\"'`“")))
+         (sn--rx (or bol " ") (0+ (in "\(\"'`“")))
          "\\("
          (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/abbreviation-list)
          "\\)"
          ;; optional so will work at end or beginning of sentence
-         (rx (optional ". ")))))
+         (sn--rx (optional ". ")))))
 
 (sn/reload-non-sentence-regex)
 
-;; as suggested by emacs wiki
-(defmacro sn--rx-extra (&rest body-forms)
-  (let ((add-ins (list
-                  ;; wish could use previous ones..
-                  `(left-quotes . ,(rx (in "\"“`'")))
-                  `(sentence-end-char . ,(rx (in ".\"”`'!?…。？")))
-                  `(0+-left-quotes . ,(rx (0+ (in "\"“`'"))))
-                  `(0+-right-quotes . ,(rx (0+ (in "\"”`'"))))
-                  `(maybe-sentence-start . ,(rx (0+ (in "\"“`'"))
-                                                upper))
-                  `(maybe-sentence-end . ,(rx (in ".!?…。？") (0+ (in "\"”`'"))))
-                  `(bol-ignoring-ws . ,(rx bol (0+ space))))))
-    `(let ((rx-constituents (append ',add-ins rx-constituents nil)))
-       ,@body-forms)))
-
 ;; regex for searching forward/backward
-(defvar sn--maybe-sentence-search
-  (sn--rx-extra (rx (or
-                     (and maybe-sentence-end " " (optional " "))
-                     ;; non-precise but hopefully comprehensive way to deal with comments
-                     (and bol (0+ space) (0+ (not letter)) (0+ space)))
-                    maybe-sentence-start)))
+(defconst sn--maybe-sentence-search
+  (sn--rx (or
+           (and maybe-sentence-end " " (optional " "))
+           ;; non-precise but hopefully comprehensive way to deal with comments
+           (and bol (0+ space) (0+ (not letter)) (0+ space)))
+          maybe-sentence-start))
 
-(defvar sn--maybe-sentence-end-search
-  (sn--rx-extra (rx maybe-sentence-end
-                    (or
-                     (and " " (optional " ")
-                          maybe-sentence-start)
-                     (and (0+ space) eol)))))
+(defconst sn--maybe-sentence-end-search
+  (sn--rx maybe-sentence-end
+          (or
+           (and " " (optional " ")
+                maybe-sentence-start)
+           (and (0+ space) eol))))
 
 ;; helpers for correcting positioning
-(defvar sn--maybe-sentence-start (sn--rx-extra (rx maybe-sentence-start)))
-(defvar sn--maybe-sentence-end (sn--rx-extra (rx maybe-sentence-end)))
+(defconst sn--maybe-sentence-start (sn--rx maybe-sentence-start))
+(defconst sn--maybe-sentence-end (sn--rx maybe-sentence-end))
 
 (defun sn--maybe-at-bol-sentence-p ()
   (let ((case-fold-search nil))
-    (and (looking-back (sn--rx-extra (rx bol-ignoring-ws)))
+    (and (looking-back (sn--rx bol-ignoring-ws))
          (looking-at sn--maybe-sentence-start))))
 
 (defun sn--maybe-before-sentence-start-p ()
   (let ((case-fold-search nil))
     (and
      (looking-at sn--maybe-sentence-start)
-     (looking-back (rx (or " " bol))))))
+     (looking-back (sn--rx (or " " bol))))))
 
 (defun sn--maybe-at-sentence-end-p ()
-  (looking-at (sn--rx-extra (rx sentence-end-char (or " " eol)))))
+  (looking-at (sn--rx sentence-final-char (or " " eol))))
 
 ;; actual commands
 (defun sn/forward-sentence (&optional arg)
