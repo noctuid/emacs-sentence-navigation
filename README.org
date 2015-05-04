@@ -6,7 +6,7 @@ There are no default key bindings. Unlike with the normal forward and backward s
 ** Abbreviations
 The list of abbreviations to ignore can be customized. The defaults are mostly the same as vim-textobj-sentence's.
 #+begin_src emacs-lisp
-(setq sn/abbreviation-list
+(setq sentence-nav-abbreviation-list
       '("[ABCDIMPSUabcdegimpsv]"
         "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
         "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
@@ -16,21 +16,21 @@ The list of abbreviations to ignore can be customized. The defaults are mostly t
 #+end_src
 If you change the abbreviation list after loading the package, you will need to run the following as well:
 #+begin_src emacs-lisp
-(sn/reload-non-sentence-regex)
+(sentence-nav-reload-abbreviations)
 #+end_src
 ** Evil
 #+begin_src emacs-lisp
-(define-key evil-normal-state-map ")" 'sn/evil-forward-sentence)
-(define-key evil-normal-state-map "(" 'sn/evil-backward-sentence)
-(define-key evil-normal-state-map "g)" 'sn/evil-forward-sentence-end)
-(define-key evil-normal-state-map "g(" 'sn/evil-backward-sentence-end)
-(define-key evil-outer-text-objects-map "s" 'sn/evil-outer-sentence)
-(define-key evil-inner-text-objects-map "s" 'sn/evil-inner-sentence)
+(define-key evil-normal-state-map ")" 'sentence-nav-evil-forward)
+(define-key evil-normal-state-map "(" 'sentence-nav-evil-backward)
+(define-key evil-normal-state-map "g)" 'sentence-nav-evil-forward-end)
+(define-key evil-normal-state-map "g(" 'sentence-nav-evil-backward-end)
+(define-key evil-outer-text-objects-map "s" 'sentence-nav-evil-outer-sentence)
+(define-key evil-inner-text-objects-map "s" 'sentence-nav-evil-inner-sentence)
 #+end_src
 ** No Evil
 #+begin_src emacs-lisp
-(global-set-key (kbd "M-e") 'sn/forward-sentence')
-(global-set-key (kbd "M-a") 'sn/backward-sentence')
+(global-set-key (kbd "M-e") 'sentence-nav-forward)
+(global-set-key (kbd "M-a") 'sentence-nav-backward)
 #+end_src
 
 * Definition of a Sentence

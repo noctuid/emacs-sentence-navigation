@@ -26,9 +26,9 @@
 (defgroup sentence-navigation nil
   "Gives commands for navigating sentences and evil text objects for manipulating them."
   :group 'editing
-  :prefix 'sn/)
+  :prefix 'sentence-nav-)
 
-(defcustom sn/abbreviation-list
+(defcustom sentence-nav-abbreviation-list
   '("[ABCDIMPSUabcdegimpsv]"
     "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
     "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
@@ -39,7 +39,7 @@
   :group 'sentence-navigation
   :type 'list)
 
-(define-arx sn--rx
+(define-arx sentence-nav--rx
   '((left-quotes (in "\"“`'"))
     (right-quotes (in "\"”`'"))
     (0+-left-quotes (0+ left-quotes))
@@ -50,154 +50,158 @@
     (maybe-sentence-end (seq sentence-ending-char 0+-right-quotes))
     (bol-ignoring-ws (seq bol (0+ space)))))
 
-(defvar sn--not-a-sentence nil)
-(defun sn/reload-non-sentence-regex ()
-  (setq sn--not-a-sentence
+(defvar sentence-nav--not-a-sentence nil)
+(defun sentence-nav-reload-abbreviations ()
+  (setq sentence-nav--not-a-sentence
         (concat
-         (sn--rx (or bol " ") (0+ (in "\(\"'`“")))
+         (sentence-nav--rx (or bol " ") (0+ (in "\(\"'`“")))
          "\\("
-         (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sn/abbreviation-list)
+         (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sentence-nav-abbreviation-list)
          "\\)"
          ;; optional so will work at end or beginning of sentence
-         (sn--rx (optional ". ")))))
+         (sentence-nav--rx (optional ". ")))))
 
-(sn/reload-non-sentence-regex)
+(sentence-nav-reload-abbreviations)
 
 ;; regex for searching forward/backward
-(defconst sn--maybe-sentence-search
-  (sn--rx (or
+(defconst sentence-nav--maybe-sentence-search
+  (sentence-nav--rx (or
            (and maybe-sentence-end " " (optional " "))
            ;; non-precise but hopefully comprehensive way to deal with comments
            (and bol (0+ space) (0+ (not letter)) (0+ space)))
           maybe-sentence-start))
 
-(defconst sn--maybe-sentence-end-search
-  (sn--rx maybe-sentence-end
+(defconst sentence-nav--maybe-sentence-end-search
+  (sentence-nav--rx maybe-sentence-end
           (or
            (and " " (optional " ")
                 maybe-sentence-start)
            (and (0+ space) eol))))
 
 ;; helpers for correcting positioning
-(defconst sn--maybe-sentence-start (sn--rx maybe-sentence-start))
-(defconst sn--maybe-sentence-end (sn--rx maybe-sentence-end))
+(defconst sentence-nav--maybe-sentence-start (sentence-nav--rx maybe-sentence-start))
+(defconst sentence-nav--maybe-sentence-end (sentence-nav--rx maybe-sentence-end))
 
-(defun sn--maybe-at-bol-sentence-p ()
+(defun sentence-nav--maybe-at-bol-sentence-p ()
   (let ((case-fold-search nil))
-    (and (looking-back (sn--rx bol-ignoring-ws))
-         (looking-at sn--maybe-sentence-start))))
+    (and (looking-back (sentence-nav--rx bol-ignoring-ws))
+         (looking-at sentence-nav--maybe-sentence-start))))
 
-(defun sn--maybe-before-sentence-start-p ()
+(defun sentence-nav--maybe-before-sentence-start-p ()
   (let ((case-fold-search nil))
     (and
-     (looking-at sn--maybe-sentence-start)
-     (looking-back (sn--rx (or " " bol))))))
+     (looking-at sentence-nav--maybe-sentence-start)
+     (looking-back (sentence-nav--rx (or " " bol))))))
 
-(defun sn--maybe-at-sentence-end-p ()
-  (looking-at (sn--rx sentence-final-char (or " " eol))))
+(defun sentence-nav--maybe-at-sentence-end-p ()
+  (looking-at (sentence-nav--rx sentence-final-char (or " " eol))))
 
 ;; actual commands
-(defun sn/forward-sentence (&optional arg)
+(defun sentence-nav-forward (&optional arg)
   "Move to the start of the next sentence ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     ;; save point in case there is no match
-    (point-to-register 'sn-saved-point)
+    (point-to-register 'sentence-nav-saved-point)
     ;; so won't stay on current sentence if at beginning of line
-    (when (sn--maybe-at-bol-sentence-p)
+    (when (sentence-nav--maybe-at-bol-sentence-p)
       (right-char))
     (while (let ((case-fold-search nil))
              ;; move back so that don't skip next sentence if right before it
-             (while (looking-back sn--maybe-sentence-end)
+             (while (looking-back sentence-nav--maybe-sentence-end)
                (left-char))
              ;; don't move at all if search fails
-             (unless (re-search-forward sn--maybe-sentence-search nil t)
-               (jump-to-register 'sn-saved-point)
+             (unless (re-search-forward sentence-nav--maybe-sentence-search nil t)
+               (jump-to-register 'sentence-nav-saved-point)
                (return nil))
-             (while (not (sn--maybe-before-sentence-start-p))
+             (while (not (sentence-nav--maybe-before-sentence-start-p))
                (left-char))
-             (looking-back sn--not-a-sentence)))))
+             (looking-back sentence-nav--not-a-sentence)))))
 
-(defun sn/forward-sentence-end (&optional arg)
+(defun sentence-nav-forward-end (&optional arg)
   "Move to the start of the next sentence end ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
-    (point-to-register 'sn-saved-point)
+    (point-to-register 'sentence-nav-saved-point)
     (while (let ((case-fold-search nil))
              ;; move to start of next possible sentence
              ;; if already at end of current or after an abbrev
-             (when (sn--maybe-at-sentence-end-p)
-               (unless (re-search-forward sn--maybe-sentence-start nil t)
+             (when (sentence-nav--maybe-at-sentence-end-p)
+               (unless (re-search-forward sentence-nav--maybe-sentence-start nil t)
                  ;; prevents infinite loop at end of file after abbrev
                  (return nil)))
-             (unless (re-search-forward sn--maybe-sentence-end-search nil t)
-               (jump-to-register 'sn-saved-point)
+             (unless (re-search-forward sentence-nav--maybe-sentence-end-search nil t)
+               (jump-to-register 'sentence-nav-saved-point)
                (return nil))
-             (while (not (sn--maybe-at-sentence-end-p))
+             (while (not (sentence-nav--maybe-at-sentence-end-p))
                (left-char))
-             (looking-back sn--not-a-sentence)))))
+             (looking-back sentence-nav--not-a-sentence)))))
 
-(defun sn/backward-sentence (&optional arg)
+(defun sentence-nav-backward (&optional arg)
   "Move to the start of the previous sentence ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
     (while (let ((case-fold-search nil))
-             (unless (re-search-backward sn--maybe-sentence-search nil t)
+             (unless (re-search-backward sentence-nav--maybe-sentence-search nil t)
                (return nil))
-             (while (not (looking-at sn--maybe-sentence-start))
+             (while (not (looking-at sentence-nav--maybe-sentence-start))
                (right-char))
-             (looking-back sn--not-a-sentence)))))
+             (looking-back sentence-nav--not-a-sentence)))))
 
-(defun sn/backward-sentence-end (&optional arg)
+(defun sentence-nav-backward-end (&optional arg)
   "Move to the start of the previous sentence end ARG times."
   (interactive)
   (dotimes (_ (or arg 1))
-    (point-to-register 'sn-saved-point)
+    (point-to-register 'sentence-nav-saved-point)
     ;; move forward so don't skip prevous sentence if right in front of it
     (while (let ((case-fold-search nil))
-             (looking-at sn--maybe-sentence-start))
+             (looking-at sentence-nav--maybe-sentence-start))
       (right-char))
     (while (let ((case-fold-search nil))
-             (unless (re-search-backward sn--maybe-sentence-end-search nil t)
-               (jump-to-register 'sn-saved-point)
+             (unless (re-search-backward sentence-nav--maybe-sentence-end-search nil t)
+               (jump-to-register 'sentence-nav-saved-point)
                (return nil))
-             (while (not (sn--maybe-at-sentence-end-p))
+             (while (not (sentence-nav--maybe-at-sentence-end-p))
                (right-char))
-      (looking-back sn--not-a-sentence)))))
+      (looking-back sentence-nav--not-a-sentence)))))
 
 ;; add evil motions and text-objects if/when evil loads
 (with-eval-after-load 'evil
-  (evil-define-motion sn/evil-forward-sentence (count)
+  (evil-define-motion sentence-nav-evil-forward (count)
     "Move to the start of the COUNT-th next sentence."
-    (sn/forward-sentence (or count 1)))
+    (sentence-nav-forward (or count 1)))
 
-  (evil-define-motion sn/evil-forward-sentence-end (count)
+  (evil-define-motion sentence-nav-evil-forward-end (count)
     "Move to the end of the COUNT-th next sentence."
-    (sn/forward-sentence-end (or count 1)))
+    (sentence-nav-forward-end (or count 1)))
 
-  (evil-define-motion sn/evil-backward-sentence (count)
+  (evil-define-motion sentence-nav-evil-backward (count)
     "Move to the start of the COUNT-th previous sentence."
-    (sn/backward-sentence (or count 1)))
+    (sentence-nav-backward (or count 1)))
 
-  (evil-define-motion sn/evil-backward-sentence-end (count)
+  (evil-define-motion sentence-nav-evil-backward-end (count)
     "Move to the end of the COUNT-th privous sentence."
-    (sn/backward-sentence-end (or count 1)))
+    (sentence-nav-backward-end (or count 1)))
 
-  (put 'sn/evil-a-sentence 'beginning-op 'sn/evil-backward-sentence)
-  (put 'sn/evil-a-sentence 'forward-op   'sn/evil-forward-sentence)
+  (put 'sentence-nav-evil-a-sentence 'beginning-op
+       'sentence-nav-evil-backward)
+  (put 'sentence-nav-evil-a-sentence 'forward-op
+       'sentence-nav-evil-forward)
 
-  (put 'sn/evil-inner-sentence 'beginning-op 'sn/evil-backward-sentence)
-  (put 'sn/evil-inner-sentence 'forward-op (lambda (count)
-                                             (sn/evil-forward-sentence-end count)
-                                             (right-char)))
+  (put 'sentence-nav-evil-inner-sentence 'beginning-op
+       'sentence-nav-evil-backward-sentence)
+  (put 'sentence-nav-evil-inner-sentence
+       'forward-op (lambda (count)
+                     (sentence-nav-evil-forward-end count)
+                     (right-char)))
 
-  (evil-define-text-object sn/evil-outer-sentence (count &optional beg end type)
+  (evil-define-text-object sentence-nav-evil-outer-sentence (count &optional beg end type)
     "Select a sentence including spaces after it."
-    (evil-select-inner-object 'sn/evil-a-sentence beg end type count))
+    (evil-select-inner-object 'sentence-nav-evil-a-sentence beg end type count))
 
-  (evil-define-text-object sn/evil-inner-sentence (count &optional beg end type)
+  (evil-define-text-object sentence-nav-evil-inner-sentence (count &optional beg end type)
     "Select a sentence excluding spaces after it."
-    (evil-select-inner-object 'sn/evil-inner-sentence beg end type count)))
+    (evil-select-inner-object 'sentence-nav-evil-inner-sentence beg end type count)))
 
 (provide 'sentence-navigation)
 ;;; sentence-navigation.el ends here
