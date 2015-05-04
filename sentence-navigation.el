@@ -3,7 +3,7 @@
 ;; Author: Lit Wakefield <nocturnal.artifice@gmail.com>
 ;; URL: https://github.com/angelic-sedition/emacs-sentence-navigation
 ;; Keywords: sentence evil
-;; Package-Requires: ((cl-lib "0.5") (ample-regexps "0.1"))
+;; Package-Requires: ((cl-lib "0.5") (ample-regexps "0.1") (emacs "24.4"))
 ;; Version: 0.1
 
 ;;; Commentary:
@@ -165,9 +165,8 @@
                (right-char))
       (looking-back sn--not-a-sentence)))))
 
-;; add evil motions and text-objects if evil exists
-(when (require 'evil nil :noerror)
-
+;; add evil motions and text-objects if/when evil loads
+(with-eval-after-load 'evil
   (evil-define-motion sn/evil-forward-sentence (count)
     "Move to the start of the COUNT-th next sentence."
     (sn/forward-sentence (or count 1)))
