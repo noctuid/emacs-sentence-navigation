@@ -129,6 +129,7 @@
              (when (sentence-nav--maybe-at-sentence-end-p)
                (unless (re-search-forward sentence-nav--maybe-sentence-start nil t)
                  ;; prevents infinite loop at end of file after abbrev
+                 ;; because the next search will actually succeed in this case
                  (return nil)))
              (unless (re-search-forward sentence-nav--maybe-sentence-end-search nil t)
                (jump-to-register 'sentence-nav-saved-point)

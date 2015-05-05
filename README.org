@@ -3,6 +3,7 @@
 
 * Example Configuration
 There are no default key bindings. Unlike with the normal forward and backward sentence commands, these commands will move to the beginning or end of the sentence, not to the space in between.
+
 ** Abbreviations
 The list of abbreviations to ignore can be customized. The defaults are mostly the same as vim-textobj-sentence's.
 #+begin_src emacs-lisp
@@ -18,6 +19,7 @@ If you change the abbreviation list after loading the package, you will need to 
 #+begin_src emacs-lisp
 (sentence-nav-reload-abbreviations)
 #+end_src
+
 ** Evil
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map ")" 'sentence-nav-evil-forward)
@@ -32,6 +34,7 @@ If you change the abbreviation list after loading the package, you will need to 
 (global-set-key (kbd "M-e") 'sentence-nav-forward)
 (global-set-key (kbd "M-a") 'sentence-nav-backward)
 #+end_src
+Both `sentence-nav-forward-end` and `sentence-nav-backward-end` can also be bound.
 
 * Definition of a Sentence
 Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
@@ -39,8 +42,7 @@ Sentences start with a capital letter (possibly preceded some type of a left quo
 * Impossible Cases
 For the most part, this plugin can distinguish accurately between one-spaced sentences and abbreviations. In the rare case that a sentence actually does end in an abbreviation (not followed by "?", "!", etc.), this plugin will skip over that sentence. Because of this, I have removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
 
-Also if hard line wrapping is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line. It is possible to fix this for single-spaced hard-wrapped sentences by checking if the previous line ends in a period and not an abbreviation, but I haven't bothered implementing this extra check for now at least.
-
+Also, if hard line wrapping is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line. It is possible to fix this for single-spaced hard-wrapped sentences by checking if the previous line ends in a period and not an abbreviation, but I haven't bothered implementing this extra check for now at least.
 
 * Other Notes
 Emacs doesn't have support for negative look behind, so this uses ~looking-back~. Emacs says this should be avoided because it is slow, but it works fine for this.
