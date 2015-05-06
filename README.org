@@ -45,7 +45,7 @@ If you change the abbreviation list after loading the package, you will need to 
 (global-set-key (kbd "M-e") 'sentence-nav-forward)
 (global-set-key (kbd "M-a") 'sentence-nav-backward)
 #+end_src
-Both `sentence-nav-forward-end` and `sentence-nav-backward-end` can also be bound.
+Both ~sentence-nav-forward-end~ and ~sentence-nav-backward-end~ can also be bound.
 
 * Definition of a Sentence
 Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
