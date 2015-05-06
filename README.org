@@ -1,6 +1,17 @@
 * About
 =sentence-navigation.el= is inspired by [[https://github.com/reedes/vim-textobj-sentence][vim-textobj-sentence]] and uses a mostly the same default abbreviation list. It provides alternatives to ~forward-sentence~, ~backward-sentence~, and sentence text objects that work with sentences separated by one (or two) space(s) and is aware of abbreviations.
 
+* Installation
+If you use MELPA, =sentence-navigation.el= can be installed with ~package-install~. To use it, put ~(require 'sentence-navigation)~ in your init file. Alternatively, here's an example [[https://github.com/jwiegley/use-package][use-package]] configuration (assuming the non-evil commands are being used):
+#+begin_src emacs-lisp
+(use-package sentence-navigation
+  :ensure t
+  :commands (sentence-nav-forward
+             sentence-nav-backward
+             sentence-nav-forward-end
+             sentence-nav-backward-end))
+#+end_src
+
 * Example Configuration
 There are no default key bindings. Unlike with the normal forward and backward sentence commands, these commands will move to the beginning or end of the sentence, not to the space in between.
 
