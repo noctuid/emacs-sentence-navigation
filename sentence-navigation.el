@@ -71,7 +71,7 @@
   (sentence-nav--rx (or
            (and maybe-sentence-end " " (optional " "))
            ;; non-precise but hopefully comprehensive way to deal with comments
-           (and bol (0+ space) (0+ (not letter)) (0+ space)))
+           (and bol (0+ space) (and (0+ (not letter)) (1+ space))))
           maybe-sentence-start))
 
 (defconst sentence-nav--maybe-sentence-end-search
