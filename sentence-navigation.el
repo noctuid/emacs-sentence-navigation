@@ -40,14 +40,17 @@
   :type 'list)
 
 (define-arx sentence-nav--rx
-  '((left-quotes (in "\"“`'"))
-    (right-quotes (in "\"”`'"))
-    (0+-left-quotes (0+ left-quotes))
-    (0+-right-quotes (0+ right-quotes))
+  '((left-quote (in "\"“`'"))
+    (right-quote (in "\"”`'"))
+    ;; characters that can be used for italic, literal, etc. in markdown and org
+    (left-markup-char (in "*+/~=_["))
+    (right-markup-char (in "*+/~=_]"))
+    (0+-sentence-before-chars (0+ (or left-quote left-markup-char)))
+    (0+-sentence-after-chars (0+ (or right-quote right-markup-char)))
     (sentence-ending-char (in ".!?…。？"))
-    (sentence-final-char (or sentence-ending-char right-quotes))
-    (maybe-sentence-start (seq 0+-left-quotes upper))
-    (maybe-sentence-end (seq sentence-ending-char 0+-right-quotes))
+    (sentence-final-char (or sentence-ending-char right-quote right-markup-char))
+    (maybe-sentence-start (seq 0+-sentence-before-chars upper))
+    (maybe-sentence-end (seq sentence-ending-char 0+-sentence-after-chars))
     (bol-ignoring-ws (seq bol (0+ space)))))
 
 (defvar sentence-nav--not-a-sentence nil)

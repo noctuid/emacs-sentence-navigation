@@ -48,7 +48,7 @@ If you change the abbreviation list after loading the package, you will need to 
 Both ~sentence-nav-forward-end~ and ~sentence-nav-backward-end~ can also be bound.
 
 * Definition of a Sentence
-Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
+Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). In addition to quotes, org and markdown markup characters (such as =_= and =*=) can be around sentences. Like with quotes, the point will be moved to just before or after the last surrounding markup character. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
 
 * Impossible Cases
 For the most part, this plugin can distinguish accurately between one-spaced sentences and abbreviations. In the rare case that a sentence actually does end in an abbreviation (not followed by "?", "!", etc.), this plugin will skip over that sentence. Because of this, I have removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
