@@ -91,7 +91,8 @@
   (let ((case-fold-search nil))
     (and
      (looking-at sentence-nav--maybe-sentence-start)
-     (looking-back (sentence-nav--rx (or " " bol))))))
+     (looking-back (sentence-nav--rx (or " "
+                                         (and bol (0+ space))))))))
 
 (defun sentence-nav--maybe-at-sentence-end-p ()
   (looking-at (sentence-nav--rx sentence-final-char (or " " eol))))
