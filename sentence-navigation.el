@@ -3,7 +3,7 @@
 ;; Author: Lit Wakefield <noct@openmailbox.org>
 ;; URL: https://github.com/noctuid/emacs-sentence-navigation
 ;; Keywords: sentence evil
-;; Package-Requires: ((cl-lib "0.5") (ample-regexps "0.1") (emacs "24.4"))
+;; Package-Requires: ((ample-regexps "0.1") (emacs "24.4"))
 ;; Version: 0.1
 
 ;;; Commentary:
@@ -20,7 +20,6 @@
 ;; For more information see the README in the github repo.
 
 ;;; Code:
-(require 'cl-lib)
 (eval-and-compile (require 'ample-regexps))
 
 (defgroup sentence-navigation nil
@@ -59,7 +58,7 @@
         (concat
          (sentence-nav--rx (or bol " ") (0+ (in "\(\"'`“")))
          "\\("
-         (cl-reduce #'(lambda (x y) (concat x "\\|" y)) sentence-nav-abbreviation-list)
+         (mapconcat (lambda (x) x) sentence-nav-abbreviation-list "\\|")
          "\\)"
          ;; optional so will work at end or beginning of sentence
          (sentence-nav--rx (optional ". ")))))
