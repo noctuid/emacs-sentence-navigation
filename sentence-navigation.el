@@ -193,14 +193,14 @@
        'sentence-nav-evil-forward)
 
   (put 'sentence-nav-evil-inner-sentence 'beginning-op
-       'sentence-nav-evil-backward-sentence)
+       'sentence-nav-evil-backward)
   (put 'sentence-nav-evil-inner-sentence
        'forward-op (lambda (count)
                      (sentence-nav-evil-forward-end count)
                      (right-char)))
 
   (evil-define-text-object sentence-nav-evil-outer-sentence (count &optional beg end type)
-    "Select a sentence including spaces after it."
+    "Select a sentence up to the start of the next sentence after it."
     (evil-select-inner-object 'sentence-nav-evil-a-sentence beg end type count))
 
   (evil-define-text-object sentence-nav-evil-inner-sentence (count &optional beg end type)
