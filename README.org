@@ -1,4 +1,4 @@
-* About
+* About [[http://melpa.org/#/sentence-navigation][file:http://melpa.org/packages/sentence-navigation-badge.svg]]
 =sentence-navigation.el= is inspired by [[https://github.com/reedes/vim-textobj-sentence][vim-textobj-sentence]] and uses a mostly the same default abbreviation list. It provides alternatives to ~forward-sentence~, ~backward-sentence~, and sentence text objects that work with sentences separated by one (or two) space(s) and is aware of abbreviations.
 
 * Installation
