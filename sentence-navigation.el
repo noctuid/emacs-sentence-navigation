@@ -112,6 +112,7 @@ A helper function for `sentence-nav-forward-end' and for
   (looking-at (sentence-nav--rx sentence-final-char (or " " eol))))
 
 ;; actual commands
+;;;###autoload
 (defun sentence-nav-forward (&optional arg)
   "Move to the start of the next sentence ARG times."
   (interactive)
@@ -134,6 +135,7 @@ A helper function for `sentence-nav-forward-end' and for
                (left-char))
              (looking-back sentence-nav--not-a-sentence)))))
 
+;;;###autoload
 (defun sentence-nav-forward-end (&optional arg)
   "Move to the start of the next sentence end ARG times."
   (interactive)
@@ -156,6 +158,7 @@ A helper function for `sentence-nav-forward-end' and for
                (left-char))
              (looking-back sentence-nav--not-a-sentence)))))
 
+;;;###autoload
 (defun sentence-nav-backward (&optional arg)
   "Move to the start of the previous sentence ARG times."
   (interactive)
@@ -168,6 +171,7 @@ A helper function for `sentence-nav-forward-end' and for
                (right-char))
              (looking-back sentence-nav--not-a-sentence)))))
 
+;;;###autoload
 (defun sentence-nav-backward-end (&optional arg)
   "Move to the start of the previous sentence end ARG times."
   (interactive)
@@ -227,6 +231,15 @@ A helper function for `sentence-nav-forward-end' and for
     "Select a sentence excluding spaces after it."
     (evil-select-inner-object 'sentence-nav-evil-inner-sentence
                               beg end type count)))
+
+;;;###autoload
+(with-eval-after-load 'evil
+  (autoload 'sentence-nav-evil-forward "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-forward-end "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-backward "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-backward-end "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-outer-sentence "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-inner-sentence "sentence-navigation" nil t))
 
 (provide 'sentence-navigation)
 ;;; sentence-navigation.el ends here
