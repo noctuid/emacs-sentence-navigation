@@ -34,6 +34,8 @@ If you change the abbreviation list after loading the package, you will need to 
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map ")" 'sentence-nav-evil-forward)
 (define-key evil-normal-state-map "(" 'sentence-nav-evil-backward)
+(define-key evil-operator-state-map ")" 'sentence-nav-evil-forward)
+(define-key evil-operator-state-map "(" 'sentence-nav-evil-backward)
 (define-key evil-normal-state-map "g)" 'sentence-nav-evil-forward-end)
 (define-key evil-normal-state-map "g(" 'sentence-nav-evil-backward-end)
 (define-key evil-outer-text-objects-map "s" 'sentence-nav-evil-outer-sentence)
