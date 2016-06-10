@@ -1,6 +1,6 @@
 ;;; sentence-navigation.el --- Commands to navigate one-spaced sentences.
 
-;; Author: Lit Wakefield <noct@openmailbox.org>
+;; Author: Fox Kiester <noct@openmailbox.org>
 ;; URL: https://github.com/noctuid/emacs-sentence-navigation
 ;; Keywords: sentence evil
 ;; Package-Requires: ((ample-regexps "0.1") (emacs "24.4"))
