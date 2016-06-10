@@ -221,7 +221,7 @@ A helper function for `sentence-nav-forward-end' and for
                      (sentence-nav-evil-forward-end count)
                      (right-char)))
 
-  (evil-define-text-object sentence-nav-evil-outer-sentence
+  (evil-define-text-object sentence-nav-evil-a-sentence
     (count &optional beg end type)
     "Select a sentence up to the start of the next sentence after it."
     (evil-select-inner-object 'sentence-nav-evil-a-sentence beg end type count))
@@ -238,7 +238,7 @@ A helper function for `sentence-nav-forward-end' and for
   (autoload 'sentence-nav-evil-forward-end "sentence-navigation" nil t)
   (autoload 'sentence-nav-evil-backward "sentence-navigation" nil t)
   (autoload 'sentence-nav-evil-backward-end "sentence-navigation" nil t)
-  (autoload 'sentence-nav-evil-outer-sentence "sentence-navigation" nil t)
+  (autoload 'sentence-nav-evil-a-sentence "sentence-navigation" nil t)
   (autoload 'sentence-nav-evil-inner-sentence "sentence-navigation" nil t))
 
 (provide 'sentence-navigation)

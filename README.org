@@ -38,7 +38,7 @@ Note that =)= and =(= are bound in motion state by default. Keys bound in motion
 (define-key evil-motion-state-map "(" 'sentence-nav-evil-backward)
 (define-key evil-motion-state-map "g)" 'sentence-nav-evil-forward-end)
 (define-key evil-motion-state-map "g(" 'sentence-nav-evil-backward-end)
-(define-key evil-outer-text-objects-map "s" 'sentence-nav-evil-outer-sentence)
+(define-key evil-outer-text-objects-map "s" 'sentence-nav-evil-a-sentence)
 (define-key evil-inner-text-objects-map "s" 'sentence-nav-evil-inner-sentence)
 #+end_src
 ** No Evil
