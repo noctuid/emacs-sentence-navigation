@@ -12,23 +12,7 @@ If you use MELPA, =sentence-navigation.el= can be installed with ~package-instal
 #+end_src
 
 * Example Configuration
-There are no default key bindings. Unlike with the normal forward and backward sentence commands, these commands will move to the beginning or end of the sentence, not to the space in between.
-
-** Abbreviations
-The list of abbreviations to ignore can be customized. The defaults are mostly the same as vim-textobj-sentence's.
-#+begin_src emacs-lisp
-(setq sentence-nav-abbreviation-list
-      '("[ABCDIMPSUabcdegimpsv]"
-        "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
-        "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
-        "alt" "[Ee]tc" "div" "es[pt]" "[Ll]td" "min"
-        "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
-        "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
-#+end_src
-If you change the abbreviation list after loading the package, you will need to run the following as well:
-#+begin_src emacs-lisp
-(sentence-nav-reload-abbreviations)
-#+end_src
+There are no default key bindings. Unlike emacs' normal forward and backward sentence commands, this package provides four commands that will move either to the start or end of a sentence instead of to the space in between sentences.
 
 ** Evil
 Note that =)= and =(= are bound in motion state by default. Keys bound in motion state are inherited by the normal, visual, and operator states if they are not explicitly bound in those states.
@@ -47,6 +31,27 @@ Note that =)= and =(= are bound in motion state by default. Keys bound in motion
 (global-set-key (kbd "M-a") 'sentence-nav-backward)
 #+end_src
 Both ~sentence-nav-forward-end~ and ~sentence-nav-backward-end~ can also be bound.
+
+** Abbreviations
+The list of abbreviations to ignore can be customized. The defaults are mostly the same as vim-textobj-sentence's.
+#+begin_src emacs-lisp
+(setq sentence-nav-abbreviation-list
+      '("[ABCDIMPSUabcdegimpsv]"
+        "l[ab]" "[eRr]d" "Ph" "[Ccp]l" "[Ll]n" "[c]o"
+        "[Oe]p" "[DJMSh]r" "[MVv]s" "[CFMPScfpw]t"
+        "alt" "[Ee]tc" "div" "es[pt]" "[Ll]td" "min"
+        "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
+        "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
+#+end_src
+If you change the abbreviation list after loading the package, you will need to run the following as well:
+#+begin_src emacs-lisp
+(sentence-nav-reload-abbreviations)
+#+end_src
+
+** Jump Locations
+By default, any delimiters that can surround a sentence such as quotation marks will be considered as part of the start or end of a sentence. This means that the jump commands will jump to quotation marks. If you would prefer to have the commands always jump to the capital letter at the start of the sentence or the period at the end, you can set =sentence-nav-jump-to-syntax= to =nil=.
+
+For evil users, =sentence-nav-syntax-text-objects= can be set to a non-nil value to change the distinction between the inner and outer text objects. When this variable is non-nil, the outer text object will include any delimiters such as quotation marks while the inner text object will not.
 
 * Definition of a Sentence
 Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). In addition to quotes, org and markdown markup characters (such as =_= and =*=) can be around sentences. Like with quotes, the point will be moved to just before or after the last surrounding markup character. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
