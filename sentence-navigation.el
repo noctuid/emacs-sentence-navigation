@@ -112,7 +112,7 @@ A helper function for `sentence-nav-forward-end' and for
 `sentence-nav-backward-end'."
   (looking-at (sentence-nav--rx sentence-final-char (or " " eol))))
 
-(defmacro sentence-nav-incf (var)
+(defmacro sentence-nav--incf (var)
   "Like `cl-incf' but nil will be changed to 1."
   `(if ,var
        (cl-incf ,var)
@@ -144,7 +144,7 @@ A helper function for `sentence-nav-forward-end' and for
                (save-match-data
                  (looking-back sentence-nav--not-a-sentence
                                (line-beginning-position)))))
-      (sentence-nav-incf count)
+      (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (point)
                         (1- (match-end 1)))))
@@ -166,7 +166,7 @@ A helper function for `sentence-nav-forward-end' and for
                (save-match-data
                  (looking-back sentence-nav--not-a-sentence
                                (line-beginning-position)))))
-      (sentence-nav-incf count)
+      (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (point)
                         (1- (match-end 1)))))
@@ -192,7 +192,7 @@ A helper function for `sentence-nav-forward-end' and for
                (save-match-data
                  (looking-back sentence-nav--not-a-sentence
                                (line-beginning-position)))))
-      (sentence-nav-incf count)
+      (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (1- (match-end 1))
                         (point))))
@@ -220,7 +220,7 @@ A helper function for `sentence-nav-forward-end' and for
                (save-match-data
                  (looking-back sentence-nav--not-a-sentence
                                (line-beginning-position)))))
-      (sentence-nav-incf count)
+      (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (1- (match-end 1))
                         (point))))
