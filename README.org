@@ -53,13 +53,11 @@ By default, any delimiters that can surround a sentence such as quotation marks 
 
 For evil users, =sentence-nav-syntax-text-objects= can be set to a non-nil value to change the distinction between the inner and outer text objects. When this variable is non-nil, the outer text object will include any delimiters such as quotation marks while the inner text object will not.
 
+** Accurate Jumps for Hard-Wrapped Sentences
+By default, this package assumes that a capital letter at the beginning of the line starts a sentence. While this works fine for soft-wrapped sentences, it can result in incorrect jumps when using hard-wrapped sentences (e.g. when a line begins with a name that is in the middle of a sentence). To fix this, users must set =sentence-nav-hard-wrapping= to a non-nil value and ensure that =sentence-nav-non-sentence-line-alist= is properly set for the =major-mode= being used. This is necessary to ensure that sentences that start the line after some markup (e.g. a markdown or org heading) are handled correctly.
+
 * Definition of a Sentence
 Sentences start with a capital letter (possibly preceded some type of a left quotation mark). They end with a period (or other characters like "!", "?", or an ellipsis) possibly followed by some right quotation mark(s). In addition to quotes, org and markdown markup characters (such as =_= and =*=) can be around sentences. Like with quotes, the point will be moved to just before or after the last surrounding markup character. Abbreviations are irrelevant for two-spaced sentences, and this plugin will work fine for them.
 
 * Impossible Cases
 For the most part, this plugin can distinguish accurately between one-spaced sentences and abbreviations. In the rare case that a sentence actually does end in an abbreviation (not followed by "?", "!", etc.), this plugin will skip over that sentence. Because of this, I have removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
-
-Also, if hard line wrapping is being used, there is no way to distinguish between a sentence that starts at the beginning of the line and a capitalized word at the beginning of the line. It is possible to fix this for single-spaced hard-wrapped sentences by checking if the previous line ends in a period and not an abbreviation, but I haven't bothered implementing this extra check for now at least.
-
-* Other Notes
-Emacs doesn't have support for negative look behind, so this uses ~looking-back~. Emacs says this should be avoided because it is slow, but it works fine for this.

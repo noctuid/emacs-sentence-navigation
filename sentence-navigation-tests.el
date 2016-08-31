@@ -108,7 +108,21 @@ is not considered as part of the region."
   (should (string= (sentence-nav-with "|First. Second. Third. Fourth." "2)")
                    "First. Second. |Third. Fourth."))
   (should (string= (sentence-nav-with "|One. Two." "99)")
-                   "One. |Two.")))
+                   "One. |Two."))
+  ;; test sentence-nav-hard-wrapping
+  (let ((sentence-nav-hard-wrapping t))
+    ;; sentences
+    (should (string= (sentence-nav-with "|Sentence 1.\n\nSentence 2." ")")
+                     "Sentence 1.\n\n|Sentence 2."))
+    (should (string= (sentence-nav-with "|* Org Heading\nA sentence." ")")
+                     "* Org Heading\n|A sentence."))
+    (should (string= (sentence-nav-with "|Full sentence 1.\nFull sentence 2" ")")
+                     "Full sentence 1.\n|Full sentence 2"))
+    ;; non-sentences
+    (should (string= (sentence-nav-with "|Split\nSentence." ")")
+                     "|Split\nSentence."))
+    (should (string= (sentence-nav-with "|Mr.\nSmith's sentence got split." ")")
+                     "|Mr.\nSmith's sentence got split."))))
 
 (ert-deftest sentence-nav-backward ()
   ;; basic case

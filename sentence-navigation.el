@@ -53,6 +53,35 @@ users."
   :group 'sentence-navigation
   :type 'boolean)
 
+(defcustom sentence-nav-hard-wrapping nil
+  "When nil, a line that begins with a capital letter will always be considered
+to be the start of a sentence. This will not cause a problem for soft-wrapped
+for sentences, but for hard-wrapped sentences, the provided commands will not be
+able to distinguish between a sentence that starts at the beginning of a line
+and a capitalized word (such as a name) at the beginning of the line.
+
+When non-nil, the provided commands will work correctly for both soft-wrapped
+and hard-wrapped sentences provided that `sentence-nav-non-sentence-line-alist'
+is properly customized for the current major mode. A capital letter at the
+beginning of a line will only be considered to be the start of the sentence if
+the previous line is a newline, ends with a sentence end, or matches one of the
+regexps for the current major mode in `sentence-nav-non-sentence-line-alist'."
+  :group 'sentence-navigation
+  :type 'boolean)
+
+(defvar sentence-nav-non-sentence-line-alist
+  '((org-mode . ("^\\*+ " "^[[:blank:]]*#\\+end_src[[:blank:]]*$")))
+  "An alist of `major-mode' to a list of regexps.
+Each regexp describes a line that is not a sentence but can directly precede
+one. For example, one of the default regexps is for an org heading. This regexp
+lets this package know that if there is a capital letter on a line following an
+org heading, it can be assumed that the capital letter starts a sentence. This
+means checking the previous line for a sentence ending character won't be
+necessary.
+
+Note that this variable is only used when `sentence-nav-hard-wrapping' is
+non-nil.")
+
 ;; TODO unfortunately \\s$ and similar don't work in org
 (define-arx sentence-nav--rx
   '((left-quote (in "\"“`'"))
@@ -66,8 +95,7 @@ users."
     (sentence-final-char (or sentence-ending-char
                              right-quote right-markup-char))
     (maybe-sentence-start (seq 0+-sentence-before-chars upper))
-    (maybe-sentence-end (seq sentence-ending-char 0+-sentence-after-chars))
-    (bol-ignoring-ws (seq bol (0+ space)))))
+    (maybe-sentence-end (seq sentence-ending-char 0+-sentence-after-chars))))
 
 (defvar sentence-nav--not-a-sentence nil)
 (defun sentence-nav-reload-abbreviations ()
@@ -79,7 +107,7 @@ users."
          (mapconcat #'identity sentence-nav-abbreviation-list "\\|")
          "\\)"
          ;; optional so will work at end or beginning of sentence
-         (rx (optional ". ")))))
+         (rx (optional (and "." (0+ blank)))))))
 
 (sentence-nav-reload-abbreviations)
 
@@ -102,8 +130,7 @@ users."
   "Return true when possibly at the start of a sentence at the start of a line.
 A helper function for `sentence-nav-forward'."
   (let ((case-fold-search nil))
-    (and (looking-back (sentence-nav--rx bol-ignoring-ws)
-                       (line-beginning-position))
+    (and (looking-back (rx bol (0+ space)) (line-beginning-position))
          (looking-at (sentence-nav--rx maybe-sentence-start)))))
 
 (defun sentence-nav--maybe-at-sentence-end-p ()
@@ -117,6 +144,43 @@ A helper function for `sentence-nav-forward-end' and for
   `(if ,var
        (cl-incf ,var)
      (setq ,var 1)))
+
+(defun sentence-nav--at-sentence-end-line-p ()
+  "Test if the current line ends with a sentence end."
+  (save-excursion
+    (let ((inhibit-field-text-motion t))
+      (end-of-line))
+    (and
+     (looking-back (sentence-nav--rx maybe-sentence-end (0+ blank))
+                   (line-beginning-position))
+     (not (looking-back sentence-nav--not-a-sentence
+                        (line-beginning-position))))))
+
+(defun sentence-nav--at-non-sentence-line-p ()
+  "Test if the current line is not part of a sentence.
+If the current line is not blank, this function depends on
+`sentence-nav-non-sentence-line-alist' being correctly set for the current
+`major-mode'."
+  (save-excursion
+    (let ((inhibit-field-text-motion t))
+      (beginning-of-line))
+    (or (looking-at (rx bol (0+ blank) eol))
+        (let ((regexps
+               (cdr (assoc major-mode sentence-nav-non-sentence-line-alist))))
+          (when regexps
+            (looking-at (mapconcat #'identity regexps "\\|")))))))
+
+(defun sentence-nav--not-sentence-start-p ()
+  "Test if not at a valid sentence beginning position.
+Return t if after an abbreviation or if at the beginning of a hard-wrapped line
+in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
+  (or (looking-back sentence-nav--not-a-sentence (line-beginning-position))
+      (when (and sentence-nav-hard-wrapping
+                 (looking-back (rx bol (0+ blank)) (line-beginning-position)))
+        (save-excursion
+          (forward-line -1)
+          (not (or (sentence-nav--at-non-sentence-line-p)
+                   (sentence-nav--at-sentence-end-line-p)))))))
 
 ;; actual commands
 ;;;###autoload
@@ -133,17 +197,16 @@ A helper function for `sentence-nav-forward-end' and for
                 (line-beginning-position)))
       (goto-char (match-beginning 0)))
     (cl-dotimes (_ arg)
-      ;; so won't stay on current sentence if at beginning of line
-      (when (sentence-nav--maybe-at-bol-sentence-p)
-        (forward-char))
       (while (progn
+               ;; so won't stay on current sentence if at beginning of line
+               (when (sentence-nav--maybe-at-bol-sentence-p)
+                 (forward-char))
                ;; don't move at all if search fails
                (unless (re-search-forward sentence-nav--sentence-search nil t)
                  (cl-return))
                (goto-char (match-beginning 1))
                (save-match-data
-                 (looking-back sentence-nav--not-a-sentence
-                               (line-beginning-position)))))
+                 (sentence-nav--not-sentence-start-p))))
       (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (point)
@@ -164,8 +227,7 @@ A helper function for `sentence-nav-forward-end' and for
                  (cl-return))
                (goto-char (match-beginning 1))
                (save-match-data
-                 (looking-back sentence-nav--not-a-sentence
-                               (line-beginning-position)))))
+                 (sentence-nav--not-sentence-start-p))))
       (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (point)
