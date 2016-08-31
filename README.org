@@ -43,11 +43,6 @@ The list of abbreviations to ignore can be customized. The defaults are mostly t
         "[MD]rs" "[Aa]pt" "[Aa]ve?" "[Ss]tr?" "e\\.g"
         "[Aa]ssn" "[Bb]lvd" "[Dd]ept" "incl" "Inst" "Prof" "Univ"))
 #+end_src
-If you change the abbreviation list after loading the package, you will need to run the following as well:
-#+begin_src emacs-lisp
-(sentence-nav-reload-abbreviations)
-#+end_src
-
 ** Jump Locations
 By default, any delimiters that can surround a sentence such as quotation marks will be considered as part of the start or end of a sentence. This means that the jump commands will jump to quotation marks. If you would prefer to have the commands always jump to the capital letter at the start of the sentence or the period at the end, you can set =sentence-nav-jump-to-syntax= to =nil=.
 

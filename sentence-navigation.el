@@ -97,20 +97,6 @@ non-nil.")
     (maybe-sentence-start (seq 0+-sentence-before-chars upper))
     (maybe-sentence-end (seq sentence-ending-char 0+-sentence-after-chars))))
 
-(defvar sentence-nav--not-a-sentence nil)
-(defun sentence-nav-reload-abbreviations ()
-  "Create regexp for a non-sentence from `sentence-nav-abbreviation-list'."
-  (setq sentence-nav--not-a-sentence
-        (concat
-         (sentence-nav--rx (or bol space) 0+-sentence-before-chars)
-         "\\(?:"
-         (mapconcat #'identity sentence-nav-abbreviation-list "\\|")
-         "\\)"
-         ;; optional so will work at end or beginning of sentence
-         (rx (optional (and "." (0+ blank)))))))
-
-(sentence-nav-reload-abbreviations)
-
 ;; regex for searching forward/backward
 (defconst sentence-nav--sentence-search
   (sentence-nav--rx
@@ -126,6 +112,20 @@ non-nil.")
                         (and (0+ space) eol))))
 
 ;; helpers
+(defun sentence-nav--after-abbreviation-p ()
+  "Test if after an abbreviation using `sentence-nav-abbreviation-list'.
+Note that this will work at the end of a sentence (directly after the
+abbreviation or after the period) or at the beginning of a sentence (after the
+abbreviation followed by the period and whitespace)."
+  (let ((abbr (concat
+               (sentence-nav--rx (or bol space) 0+-sentence-before-chars)
+               "\\(?:"
+               (mapconcat #'identity sentence-nav-abbreviation-list "\\|")
+               "\\)"
+               ;; optional so will work at end or beginning of sentence
+               (rx (optional (and "." (0+ blank)))))))
+    (looking-back abbr (line-beginning-position))))
+
 (defun sentence-nav--maybe-at-bol-sentence-p ()
   "Return true when possibly at the start of a sentence at the start of a line.
 A helper function for `sentence-nav-forward'."
@@ -153,8 +153,7 @@ A helper function for `sentence-nav-forward-end' and for
     (and
      (looking-back (sentence-nav--rx maybe-sentence-end (0+ blank))
                    (line-beginning-position))
-     (not (looking-back sentence-nav--not-a-sentence
-                        (line-beginning-position))))))
+     (not (sentence-nav--after-abbreviation-p)))))
 
 (defun sentence-nav--at-non-sentence-line-p ()
   "Test if the current line is not part of a sentence.
@@ -174,7 +173,7 @@ If the current line is not blank, this function depends on
   "Test if not at a valid sentence beginning position.
 Return t if after an abbreviation or if at the beginning of a hard-wrapped line
 in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
-  (or (looking-back sentence-nav--not-a-sentence (line-beginning-position))
+  (or (sentence-nav--after-abbreviation-p)
       (when (and sentence-nav-hard-wrapping
                  (looking-back (rx bol (0+ blank)) (line-beginning-position)))
         (save-excursion
@@ -252,8 +251,7 @@ in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
                  (cl-return))
                (goto-char (match-beginning 1))
                (save-match-data
-                 (looking-back sentence-nav--not-a-sentence
-                               (line-beginning-position)))))
+                 (sentence-nav--after-abbreviation-p))))
       (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (1- (match-end 1))
@@ -280,8 +278,7 @@ in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
                  (cl-return))
                (goto-char (match-beginning 1))
                (save-match-data
-                 (looking-back sentence-nav--not-a-sentence
-                               (line-beginning-position)))))
+                 (sentence-nav--after-abbreviation-p))))
       (sentence-nav--incf count)
       (setq final-pos (if sentence-nav-jump-to-syntax
                           (1- (match-end 1))
