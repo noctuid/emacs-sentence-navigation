@@ -123,13 +123,14 @@ abbreviation followed by the period and whitespace)."
                (mapconcat #'identity sentence-nav-abbreviation-list "\\|")
                "\\)"
                ;; optional so will work at end or beginning of sentence
-               (rx (optional (and "." (0+ blank)))))))
+               (rx (optional (and "." (0+ blank))))))
+        case-fold-search)
     (looking-back abbr (line-beginning-position))))
 
 (defun sentence-nav--maybe-at-bol-sentence-p ()
   "Return true when possibly at the start of a sentence at the start of a line.
 A helper function for `sentence-nav-forward'."
-  (let ((case-fold-search nil))
+  (let (case-fold-search)
     (and (looking-back (rx bol (0+ blank)) (line-beginning-position))
          (looking-at (sentence-nav--rx maybe-sentence-start)))))
 
@@ -165,7 +166,8 @@ If the current line is not blank, this function depends on
       (beginning-of-line))
     (or (looking-at (rx bol (0+ blank) eol))
         (let ((regexps
-               (cdr (assoc major-mode sentence-nav-non-sentence-line-alist))))
+               (cdr (assoc major-mode sentence-nav-non-sentence-line-alist)))
+              case-fold-search)
           (when regexps
             (looking-at (mapconcat #'identity regexps "\\|")))))))
 
