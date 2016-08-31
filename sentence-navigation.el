@@ -101,15 +101,15 @@ non-nil.")
 (defconst sentence-nav--sentence-search
   (sentence-nav--rx
    (or
-    (and maybe-sentence-end (1+ space))
-    (and bol (0+ space) (0+ (syntax comment-start)) (0+ space)))
+    (and maybe-sentence-end (1+ blank))
+    (and bol (0+ blank) (0+ (syntax comment-start)) (0+ blank)))
    ;; submatch so can jump directly here
    (submatch maybe-sentence-start)))
 
 (defconst sentence-nav--sentence-end-search
   (sentence-nav--rx (submatch maybe-sentence-end)
                     (or (and " " (optional " ") maybe-sentence-start)
-                        (and (0+ space) eol))))
+                        (and (0+ blank) eol))))
 
 ;; helpers
 (defun sentence-nav--after-abbreviation-p ()
@@ -118,7 +118,7 @@ Note that this will work at the end of a sentence (directly after the
 abbreviation or after the period) or at the beginning of a sentence (after the
 abbreviation followed by the period and whitespace)."
   (let ((abbr (concat
-               (sentence-nav--rx (or bol space) 0+-sentence-before-chars)
+               (sentence-nav--rx (or bol blank) 0+-sentence-before-chars)
                "\\(?:"
                (mapconcat #'identity sentence-nav-abbreviation-list "\\|")
                "\\)"
@@ -130,7 +130,7 @@ abbreviation followed by the period and whitespace)."
   "Return true when possibly at the start of a sentence at the start of a line.
 A helper function for `sentence-nav-forward'."
   (let ((case-fold-search nil))
-    (and (looking-back (rx bol (0+ space)) (line-beginning-position))
+    (and (looking-back (rx bol (0+ blank)) (line-beginning-position))
          (looking-at (sentence-nav--rx maybe-sentence-start)))))
 
 (defun sentence-nav--maybe-at-sentence-end-p ()
@@ -192,7 +192,7 @@ in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
     ;; move back so don't skip next sentence if right before it
     (when (and (not (looking-at (sentence-nav--rx maybe-sentence-start)))
                (looking-back
-                (sentence-nav--rx maybe-sentence-end (0+ space))
+                (sentence-nav--rx maybe-sentence-end (0+ blank))
                 (line-beginning-position)))
       (goto-char (match-beginning 0)))
     (cl-dotimes (_ arg)
@@ -268,7 +268,7 @@ in the middle of a sentence (when `sentence-nav-hard-wrapping' is non-nil)."
         case-fold-search)
     ;; move forward so don't skip previous sentence if right after it
     (skip-chars-forward "[[:blank:]]")
-    (when (looking-back (sentence-nav--rx maybe-sentence-end (0+ space))
+    (when (looking-back (sentence-nav--rx maybe-sentence-end (0+ blank))
                         (line-beginning-position))
       (goto-char (1+ (match-end 0))))
     (cl-dotimes (_ arg)
