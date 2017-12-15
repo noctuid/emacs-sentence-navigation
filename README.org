@@ -56,3 +56,19 @@ Sentences start with a capital letter (possibly preceded some type of a left quo
 
 * Impossible Cases
 For the most part, this plugin can distinguish accurately between one-spaced sentences and abbreviations. In the rare case that a sentence actually does end in an abbreviation (not followed by "?", "!", etc.), this plugin will skip over that sentence. Because of this, I have removed the abbreviations "in" and "no" from =vim-textobj-sentence='s list since I think a sentence is more likely to end in either "in" or "no" than for either to be used as an abbreviation.
+
+* FAQ
+** Why doesn't it work with commented sentences?
+This packages uses regular expressions to check for comment starting characters, and not all major modes with comments add syntax table entries for their comment characters (e.g. org mode). It is recommended that you file an issue with the relevant package if you believe that it should make a syntax table entry. As a workaround, you can modify the syntax table yourself in your init file:
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (modify-syntax-entry ?# "<" org-mode-syntax-table))
+
+;; alternatively after starting emacs in the relevant buffer
+(modify-syntax-entry ?# "<")
+#+end_src
+
+Another example for text mode:
+#+begin_src emacs-lisp
+(modify-syntax-entry ?# "<" text-mode-syntax-table)
+#+end_src
