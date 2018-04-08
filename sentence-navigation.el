@@ -41,7 +41,7 @@
 (defgroup sentence-navigation nil
   "Gives commands for navigating sentences and sentence text objects."
   :group 'editing
-  :prefix 'sentence-nav-)
+  :prefix "sentence-nav-")
 
 (defcustom sentence-nav-abbreviation-list
   '("[ABCDIMPSUabcdegimpsv]"
