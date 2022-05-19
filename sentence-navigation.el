@@ -104,8 +104,10 @@ non-nil.")
     ;; characters that can be used for italic, literal, etc. in markdown and org
     (left-markup-char (in "*+/~=_["))
     (right-markup-char (in "*+/~=_]"))
-    (0+-sentence-before-chars (0+ (or left-quote left-markup-char)))
-    (0+-sentence-after-chars (0+ (or right-quote right-markup-char)))
+    (left-bracket (in "("))
+    (right-bracket (in ")"))
+    (0+-sentence-before-chars (0+ (or left-quote left-markup-char left-bracket)))
+    (0+-sentence-after-chars (0+ (or right-quote right-markup-char right-bracket)))
     (sentence-ending-char (in ".!?…。？"))
     (sentence-final-char (or sentence-ending-char
                              right-quote right-markup-char))
