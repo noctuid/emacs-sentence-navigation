@@ -99,8 +99,8 @@ non-nil.")
 
 ;; TODO unfortunately \\s$ and similar don't work in org
 (define-arx sentence-nav--rx
-  '((left-quote (in "\"“`'"))
-    (right-quote (in "\"”`'"))
+  '((left-quote (in "\"“`'«»‹›„‚"))
+    (right-quote (in "\"”`'«»‹›“‘"))
     ;; characters that can be used for italic, literal, etc. in markdown and org
     (left-markup-char (in "*+/~=_["))
     (right-markup-char (in "*+/~=_]"))
